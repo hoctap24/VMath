@@ -1,140 +1,135 @@
 let timer;
 let time = 20;
 let score = 0;
-let highScore = 0;
+let currentAnswer = 0;
+
+let highScore = localStorage.getItem("vmath_highscore") || 0;
+document.getElementById("highScoreValue").innerText = highScore;
+
+const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+startBtn.addEventListener("click", startGame);
+resetBtn.addEventListener("click", resetGame);
 
 function startGame() {
-  resetGame();
+  resetGame(false);
   generateProblem();
-  generateOptions();
   timer = setInterval(updateTimer, 1000);
-  document.getElementById("highScoreValue").innerText = highScore;
 }
 
-function resetGame() {
+function resetGame(resetHigh = false) {
   clearInterval(timer);
   time = 20;
   score = 0;
+
   document.getElementById("time").innerText = time;
-  document.getElementById("result").innerText = "";
   document.getElementById("currentScore").innerText = score;
+  document.getElementById("problem").innerText = "Nhấn Bắt đầu để chơi";
   document.getElementById("options").innerHTML = "";
-  document.getElementById("problem").innerText = "";
-  document.getElementById("highScoreValue").innerText = "0";
+  document.getElementById("result").innerText = "";
+
+  if (resetHigh) {
+    highScore = 0;
+    localStorage.removeItem("vmath_highscore");
+  }
+
+  document.getElementById("highScoreValue").innerText = highScore;
 }
 
 function updateTimer() {
   time--;
   document.getElementById("time").innerText = time;
-  if (time === 0) {
-    endGame();
-  }
+  if (time <= 0) endGame();
+}
+
+function getRangeByLevel() {
+  const level = document.getElementById("level").value;
+  if (level === "easy") return 10;
+  if (level === "medium") return 50;
+  return 100;
 }
 
 function generateProblem() {
-  const num1 = Math.floor(Math.random() * 10);
-  const num2 = Math.floor(Math.random() * 10);
-  const operation = getRandomOperation();
+  const range = getRangeByLevel();
+  const a = Math.floor(Math.random() * range);
+  const b = Math.floor(Math.random() * range) || 1;
 
-  let problem;
+  const ops = ["+", "-", "*", "/"];
+  const op = ops[Math.floor(Math.random() * ops.length)];
 
-  switch (operation) {
+  let text = "";
+
+  switch (op) {
     case "+":
-      problem = `${num1} + ${num2}`;
+      currentAnswer = a + b;
+      text = `${a} + ${b}`;
       break;
     case "-":
-      problem = `${num1} - ${num2}`;
+      currentAnswer = a - b;
+      text = `${a} - ${b}`;
       break;
     case "*":
-      problem = `${num1} * ${num2}`;
+      currentAnswer = a * b;
+      text = `${a} × ${b}`;
       break;
     case "/":
-      // Ensure a non-zero divisor
-      const divisor = num2 !== 0 ? num2 : 1;
-      const result = (num1 / divisor).toFixed(2);
-      problem = `${num1} / ${divisor}`;
+      currentAnswer = Number((a / b).toFixed(2));
+      text = `${a} ÷ ${b}`;
       break;
-    default:
-      // Handle unexpected operations
-      problem = "";
   }
 
-  document.getElementById("problem").innerText = problem;
-}
-
-function getRandomOperation() {
-  const operations = ["+", "-", "*", "/"];
-  const randomIndex = Math.floor(Math.random() * operations.length);
-  return operations[randomIndex];
+  document.getElementById("problem").innerText = text;
+  generateOptions();
 }
 
 function generateOptions() {
-  const problemText = document.getElementById("problem").innerText;
-  const correctAnswer = eval(problemText);
-  const options = [correctAnswer];
-
-  // Determine if the problem involves
-  // division or multiplication
-  const isDivision = problemText.includes("/");
-  const isMultiplication = problemText.includes("*");
+  const options = [currentAnswer];
 
   while (options.length < 4) {
-    let option;
-    if (isDivision || isMultiplication) {
-      // For division and multiplication,
-      // generate options with 2 decimal places
-      option = correctAnswer + (Math.random() * 20 - 10);
-      option = parseFloat(option.toFixed(2));
-    } else {
-      // For other operations, generate options as before
-      option = correctAnswer + Math.floor(Math.random() * 10) - 5;
-    }
-
-    if (!options.includes(option)) {
-      options.push(option);
-    }
+    let fake = currentAnswer + (Math.random() * 20 - 10);
+    fake = Number(fake.toFixed(2));
+    if (!options.includes(fake)) options.push(fake);
   }
 
   options.sort(() => Math.random() - 0.5);
 
-  const optionsContainer = document.getElementById("options");
-  optionsContainer.innerHTML = "";
-  options.forEach((option, index) => {
-    const button = document.createElement("button");
-    button.classList.add("option");
-    button.innerText = option.toFixed(2);
-    button.onclick = () => selectOption(option, correctAnswer);
-    optionsContainer.appendChild(button);
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(opt);
+    box.appendChild(btn);
   });
 }
 
-function selectOption(selectedOption, correctAnswer) {
-  if (selectedOption === correctAnswer) {
-    document.getElementById("result").innerHTML = `<span class="correct">
-                Chính xác!
-            </span>`;
+function checkAnswer(choice) {
+  if (Math.abs(choice - currentAnswer) < 0.001) {
     score++;
+    document.getElementById(
+      "result"
+    ).innerHTML = `<span class="correct">✔ Chính xác!</span>`;
     document.getElementById("currentScore").innerText = score;
     generateProblem();
-    generateOptions();
   } else {
-    document.getElementById("result").innerHTML = `<span class="incorrect">
-                Không đúng. Thử lại!
-            </span>`;
+    document.getElementById(
+      "result"
+    ).innerHTML = `<span class="incorrect">✖ Sai rồi!</span>`;
   }
-}
-function endGame() {
-  clearInterval(timer);
-  document.getElementById("result").innerText =
-    "Thời gian đã hết. Trò chơi kết thúc.";
-  document.getElementById("options").innerHTML = "";
-  document.getElementById("problem").innerText = "";
-  updateHighScore();
 }
 
-function updateHighScore() {
+function endGame() {
+  clearInterval(timer);
+  document.getElementById("options").innerHTML = "";
+  document.getElementById("problem").innerText = "⏰ Hết giờ!";
+
   if (score > highScore) {
     highScore = score;
-    document.getElementById("highScoreValue").innerText = highScore;
+    localStorage.setItem("vmath_highscore", highScore);
   }
+
+  document.getElementById("highScoreValue").innerText = highScore;
 }
