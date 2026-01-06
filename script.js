@@ -133,3 +133,4 @@ function endGame() {
 
   document.getElementById("highScoreValue").innerText = highScore;
 }
+
