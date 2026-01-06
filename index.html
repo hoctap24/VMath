@@ -1,33 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vmath</title>
+    <title>VMath</title>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
     <div class="container">
-      <h1>Trò chơi toán học</h1>
-      <p id="problem"></p>
+      <h1>VMath – Trò chơi Toán học</h1>
+
+      <div class="controls">
+        <label for="level">Độ khó:</label>
+        <select id="level">
+          <option value="easy">Dễ</option>
+          <option value="medium">Trung bình</option>
+          <option value="hard">Khó</option>
+        </select>
+      </div>
+
+      <p id="problem">Nhấn Bắt đầu để chơi</p>
+
       <div class="options" id="options"></div>
+
       <p id="result"></p>
-      <p class="score">
-        Điểm:
-        <span id="currentScore">0</span>
-      </p>
-      <p id="timer">
-        Thời gian:
-        <span id="time">20</span>
-        seconds
-      </p>
-      <button onclick="startGame()">Bắt đầu</button>
-      <button onclick="resetGame()">Tạo lại</button>
-      <p id="highScore">
-        Kỷ lục điểm:
-        <span id="highScoreValue">0</span>
-      </p>
+
+      <p class="score">Điểm: <span id="currentScore">0</span></p>
+
+      <p id="timer">Thời gian: <span id="time">20</span> giây</p>
+
+      <button id="startBtn">Bắt đầu</button>
+      <button id="resetBtn">Tạo lại</button>
+
+      <p id="highScore">Kỷ lục điểm: <span id="highScoreValue">0</span></p>
     </div>
 
     <script src="script.js"></script>
