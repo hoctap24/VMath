@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vmath</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Trò chơi toán học</h1>
+      <p id="problem"></p>
+      <div class="options" id="options"></div>
+      <p id="result"></p>
+      <p class="score">
+        Điểm:
+        <span id="currentScore">0</span>
+      </p>
+      <p id="timer">
+        Thời gian:
+        <span id="time">20</span>
+        seconds
+      </p>
+      <button onclick="startGame()">Bắt đầu</button>
+      <button onclick="resetGame()">Tạo lại</button>
+      <p id="highScore">
+        Kỷ lục điểm:
+        <span id="highScoreValue">0</span>
+      </p>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
